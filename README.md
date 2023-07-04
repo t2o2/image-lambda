@@ -18,4 +18,4 @@ Before you begin, ensure you have installed the following on your machine:
 
 # Advantage
 
-Helps you get away with the 250M limit with AWS Lambda
+Helps you get away with the 250M limit with AWS Lambda, e.g. pandas
