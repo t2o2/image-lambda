@@ -14,6 +14,7 @@ Before you begin, ensure you have installed the following on your machine:
 
 * Replace AWS info in justfile
 * Create lambda with `just create`
+* Trigger lambda with `just invoke` & check output.txt
 * Happy coding from `main.py` with `requirements.txt`
 
 # Advantage
