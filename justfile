@@ -5,6 +5,18 @@ appname := "testapp"
 aws_acc := "123456789"
 aws_region := "eu-west-2"
 lambda_timeout := "10"
+trust_policy := "trust-policy.json"
+api_name := "testfastapi-gateway"
+
+# Create IAM role with trust policy
+create-role:
+    aws iam create-role --role-name {{role_name}} --assume-role-policy-document file://{{trust_policy}}
+    aws iam attach-role-policy --role-name {{role_name}} --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+# Delete IAM role
+delete-role:
+    aws iam detach-role-policy --role-name {{role_name}} --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole  || true
+    aws iam delete-role --role-name {{role_name}}  || true
 
 # Building application to an image locally
 build-image:
@@ -26,6 +38,10 @@ update-lambda:
     aws lambda update-function-code --function-name {{appname}} \
         --image-uri {{aws_acc}}.dkr.ecr.{{aws_region}}.amazonaws.com/{{appname}}:latest
 
+# Delete Lambda function
+delete-lambda:
+    aws lambda delete-function --function-name {{appname}} || true
+
 # Create lambda using the image in ECR
 create-lambda:
     aws lambda create-function --function-name {{appname}} \
@@ -37,8 +53,11 @@ create-lambda:
 # build push update
 up: build-image push-image update-lambda
 
-# build create-repo push create
-create: create-repo build-image push-image create-lambda
+# build create repo role push create
+create: create-repo create-role build-image push-image create-lambda
+
+# Cleanup: combines all delete actions
+cleanup: delete-lambda delete-role delete-repo
 
 # Trigger your lambda
 invoke:
