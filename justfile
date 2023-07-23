@@ -6,7 +6,7 @@ aws_acc := "123456789"
 aws_region := "eu-west-2"
 lambda_timeout := "10"
 trust_policy := "trust-policy.json"
-api_name := "testfastapi-gateway"
+role_name := "lambda-execute"
 
 # Create IAM role with trust policy
 create-role:
@@ -27,6 +27,10 @@ build-image:
 create-repo:
     aws ecr describe-repositories --repository-names {{appname}} || aws ecr create-repository --repository-name {{appname}}
 
+# Delete ECR repository
+delete-repo:
+    aws ecr delete-repository --repository-name {{appname}} --force || true
+    
 # Pushing local image to ECR
 push-image:
     aws ecr get-login-password --region {{aws_region}} | docker login --username AWS --password-stdin {{aws_acc}}.dkr.ecr.{{aws_region}}.amazonaws.com
