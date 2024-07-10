@@ -8,6 +8,18 @@ lambda_timeout := "10"
 trust_policy := "trust-policy.json"
 role_name := "lambda-execute"
 
+# build create repo role push create
+create: create-repo create-role build-image push-image create-lambda
+
+# build push update
+up: build-image push-image update-lambda
+
+# Cleanup: combines all delete actions
+cleanup: delete-lambda delete-role delete-repo
+
+# Trigger your lambda
+invoke:
+    aws lambda invoke --function-name {{appname}} output.txt
 # Create IAM role with trust policy
 create-role:
     aws iam create-role --role-name {{role_name}} --assume-role-policy-document file://{{trust_policy}}
@@ -51,18 +63,5 @@ create-lambda:
     aws lambda create-function --function-name {{appname}} \
         --package-type Image \
         --code ImageUri={{aws_acc}}.dkr.ecr.{{aws_region}}.amazonaws.com/{{appname}}:latest \
-        --role arn:aws:iam::{{aws_acc}}:role/vscode-execute \
+        --role arn:aws:iam::{{aws_acc}}:role/{{role_name}} \
         --timeout {{lambda_timeout}}
-
-# build push update
-up: build-image push-image update-lambda
-
-# build create repo role push create
-create: create-repo create-role build-image push-image create-lambda
-
-# Cleanup: combines all delete actions
-cleanup: delete-lambda delete-role delete-repo
-
-# Trigger your lambda
-invoke:
-    aws lambda invoke --function-name {{appname}} output.txt
