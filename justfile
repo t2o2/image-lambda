@@ -37,7 +37,7 @@ build-image:
 
 # Create ECR repo to host images built
 create-repo:
-    aws ecr describe-repositories --repository-names {{appname}} || aws ecr create-repository --repository-name {{appname}}
+    aws ecr describe-repositories --repository-names {{appname}}  --region {{aws_region}} || aws ecr create-repository --repository-name {{appname}}  --region {{aws_region}}
 
 # Delete ECR repository
 delete-repo:
