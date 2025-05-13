@@ -52,6 +52,7 @@ push-image:
 # Update lambda with the latest image in ECR
 update-lambda:
     aws lambda update-function-code --function-name {{appname}} \
+        --region {{aws_region}} \
         --image-uri {{aws_acc}}.dkr.ecr.{{aws_region}}.amazonaws.com/{{appname}}:latest
 
 # Delete Lambda function
